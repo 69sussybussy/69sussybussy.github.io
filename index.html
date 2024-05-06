@@ -82,7 +82,8 @@
 				const divs = gallery[1].split("<div class='code-block")
 				const txt = divs[0].split('"')
 				txt.forEach((quote) => {
-					if (quote.startsWith("https://")) {
+					if (quote.startsWith("https://") && !quote.includes(" ")) {
+						console.log(quote)
 						imgs.push(quote)
 					}
 				})
