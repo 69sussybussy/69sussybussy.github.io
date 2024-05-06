@@ -13,7 +13,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: black;
         }
         #image-container {
             position: relative;
@@ -78,15 +78,11 @@
 				let imgs = [];
 				const response = await fetch(link);
 				const html = await response.text();
-				alert(html)
-				console.log(html)
 				const gallery = html.split("gallery-1")
 				const divs = gallery[1].split("<div class='code-block")
 				const txt = divs[0].split('"')
 				txt.forEach((quote) => {
 					if (quote.startsWith("https://")) {
-						alert(quote)
-						console.log(quote)
 						imgs.push(quote)
 					}
 				})
