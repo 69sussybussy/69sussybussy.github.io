@@ -78,6 +78,7 @@
 				let imgs = [];
 				const response = await fetch(link);
 				const html = await response.text();
+				alert(html)
 				console.log(html)
 				const gallery = html.split("gallery-1")
 				const divs = gallery[1].split("<div class='code-block")
