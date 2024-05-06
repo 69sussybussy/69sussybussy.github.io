@@ -73,24 +73,51 @@
         document.getElementById('prev-btn').addEventListener('click', showPreviousImage);
         document.getElementById('next-btn').addEventListener('click', showNextImage);
 
-        function fetchImageLinks() {
-            const link = prompt("Enter the link:");
-            fetch(`https://cors-anywhere.herokuapp.com/${link}`, { mode: 'cors' })
-                .then(response => response.text())
-                .then(html => {
-                    const doc = new DOMParser().parseFromString(html, 'text/html');
-                    const imgs = Array.from(doc.querySelectorAll('img')).map(img => img.src);
-                    if (imgs.length > 0) {
-                        imageLinks = imgs;
-                        displayImage(0);
-                    } else {
-                        alert("No images found.");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("Failed to fetch image links. Please try again later.");
-                });
+		async function getDivFromLink(link, divId) {
+			try {
+				const response = await fetch(link);
+				const html = await response.text();
+
+				const doc = new DOMParser().parseFromString(html, 'text/html');
+        		const targetDiv = doc.getElementById(divId);
+
+				if (targetDiv) {
+					return targetDiv.innerHTML;
+				} else {
+					return undefined;
+				}
+			} catch (error) {
+				return `Error: ${error.message}`;
+			}
+		}
+
+		async function getImageLinks(link, divId) {
+			let imgs = [];
+			let i = 1;
+			while (true) {
+				const divContent = await getDivFromLink(link, divId + i);
+				if (divContent === undefined) break;
+				const doc = new DOMParser().parseFromString(divContent, 'text/html');
+        		const imgElements = doc.querySelectorAll('img');
+				imgElements.forEach((img) => {
+					const imgSrc = img.getAttribute('src');
+					if (imgSrc) imgs.push(imgSrc);
+				});
+				i++;
+			}
+			return imgs;
+		}
+
+        async function fetchImageLinks() {
+            const link = await prompt("Enter the link:");
+			try {
+				const imgs = await getImageLinks(`https://cors-anywhere.herokuapp.com/${link}`, 'gallery-');
+				console.log(imgs);
+				imageLinks = imgs;
+				displayImage(0)
+			} catch (error) {
+				console.error(error);
+			}
         }
 
         fetchImageLinks();
