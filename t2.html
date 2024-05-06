@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #image-container {
+            position: relative;
+            cursor: pointer;
+        }
+        #image-container img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            margin: auto;
+        }
+        #prev-btn {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            height: 100%;
+        }
+        #next-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="image-container">
+        <img id="current-image" src="" alt="Image">
+        <div id="prev-btn"></div>
+        <div id="next-btn"></div>
+    </div>
+
+    <script>
+        let imageLinks = [];
+        let currentImageIndex = 0;
+
+        function displayImage(index) {
+            const img = document.getElementById('current-image');
+            img.src = imageLinks[index];
+            currentImageIndex = index;
+        }
+
+        function showNextImage() {
+            currentImageIndex = (currentImageIndex + 1) % imageLinks.length;
+            displayImage(currentImageIndex);
+        }
+
+        function showPreviousImage() {
+            currentImageIndex = (currentImageIndex - 1 + imageLinks.length) % imageLinks.length;
+            displayImage(currentImageIndex);
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', showPreviousImage);
+        document.getElementById('next-btn').addEventListener('click', showNextImage);
+
+        function fetchImageLinks() {
+            const link = prompt("Enter the link:");
+            fetch(link)
+                .then(response => response.text())
+                .then(html => {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const imgs = Array.from(doc.querySelectorAll('img')).map(img => img.src);
+                    if (imgs.length > 0) {
+                        imageLinks = imgs;
+                        displayImage(0);
+                    } else {
+                        alert("No images found.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to fetch image links. Please try again later.");
+                });
+        }
+
+        fetchImageLinks();
+    </script>
+</body>
+</html>
