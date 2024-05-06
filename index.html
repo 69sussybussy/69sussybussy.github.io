@@ -73,46 +73,28 @@
         document.getElementById('prev-btn').addEventListener('click', showPreviousImage);
         document.getElementById('next-btn').addEventListener('click', showNextImage);
 
-		async function getDivFromLink(link, divId) {
+		async function getImages(link) {
 			try {
+				let imgs = [];
 				const response = await fetch(link);
 				const html = await response.text();
-
-				const doc = new DOMParser().parseFromString(html, 'text/html');
-        		const targetDiv = doc.getElementById(divId);
-
-				if (targetDiv) {
-					return targetDiv.innerHTML;
-				} else {
-					return undefined;
-				}
+				const gallery = html.split("gallery-1")
+				const divs = gallery[1].split("<div class='code-block")
+				const txt = divs[0].split('"')
+				txt.forEach((quote) => {
+					if (quote.startsWith("https://")) {
+						imgs.push(quote)
+					}
+				})
+				return imgs
 			} catch (error) {
 				return `Error: ${error.message}`;
 			}
 		}
-
-		async function getImageLinks(link, divId) {
-			let imgs = [];
-			let i = 1;
-			while (true) {
-				const divContent = await getDivFromLink(link, divId + i);
-				if (divContent === undefined) break;
-				const doc = new DOMParser().parseFromString(divContent, 'text/html');
-        		const imgElements = doc.querySelectorAll('img');
-				imgElements.forEach((img) => {
-					const imgSrc = img.getAttribute('src');
-					if (imgSrc) imgs.push(imgSrc);
-				});
-				i++;
-			}
-			return imgs;
-		}
-
         async function fetchImageLinks() {
             const link = await prompt("Enter the link:");
 			try {
-				const imgs = await getImageLinks(`https://cors-anywhere.herokuapp.com/${link}`, 'gallery-');
-				console.log(imgs);
+				const imgs = await getImages(`https://cors-anywhere.herokuapp.com/${link}`)
 				imageLinks = imgs;
 				displayImage(0)
 			} catch (error) {
