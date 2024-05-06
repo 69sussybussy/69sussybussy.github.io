@@ -75,7 +75,7 @@
 
         function fetchImageLinks() {
             const link = prompt("Enter the link:");
-            fetch(link)
+            fetch(`https://cors-anywhere.herokuapp.com/${link}`)
                 .then(response => response.text())
                 .then(html => {
                     const doc = new DOMParser().parseFromString(html, 'text/html');
