@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .video-container {
+            margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .video-container a {
+            display: block;
+            font-size: 14px;
+            color: #007BFF;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+        .video-container a:hover {
+            text-decoration: underline;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .controls {
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            font-size: 16px;
+            margin: 5px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .input-container {
+            margin: 20px;
+            text-align: center;
+        }
+        .input-container label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .input-container input {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-container button {
+            padding: 8px 16px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav button {
+            margin: 0 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+		<button onclick="showSection('coomer')">Popular Videos</button>
+        <button onclick="showSection('user')">User Videos</button>
+    </div>
+
+    <div id="user-section" class="container">
+        <div class="input-container">
+            <label for="serviceInput">Service (onlyfans/fansly):</label>
+            <input type="text" id="serviceInput" placeholder="Enter service">
+            <label for="creatorIdInput">Creator ID:</label>
+            <input type="text" id="creatorIdInput" placeholder="Enter creator ID">
+            <button onclick="initializeFetch()">Load Videos</button>
+        </div>
+
+        <div class="controls">
+            <button onclick="changeOffset(-50)">Previous</button>
+            <input type="number" id="pageInput" min="0" value="0" onchange="goToPage()">
+            <button onclick="changeOffset(50)">Next</button>
+        </div>
+    </div>
+
+    <div id="coomer-section" class="container hidden">
+        <div class="controls">
+            <button onclick="changeOffsetCoomer(-50)">Previous</button>
+            <input type="number" id="pageInputCoomer" min="0" value="0" onchange="goToPageCoomer()">
+            <button onclick="changeOffsetCoomer(50)">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const url = "https://cors-anywhere.herokuapp.com/https://coomer.su/api/v1";
+        let i = 0;
+        let service = "";
+        let creator_id = "";
+
+        function showSection(section) {
+            document.getElementById('user-section').classList.add('hidden');
+            document.getElementById('coomer-section').classList.add('hidden');
+            document.getElementById(`${section}-section`).classList.remove('hidden');
+        }
+
+        function initializeFetch() {
+            service = document.getElementById("serviceInput").value.trim().toLowerCase();
+            creator_id = document.getElementById("creatorIdInput").value.trim();
+
+            if (service !== "onlyfans" && service !== "fansly") {
+                alert("Service must be either 'onlyfans' or 'fansly'.");
+                return;
+            }
+
+            if (!creator_id) {
+                alert("Please enter a valid Creator ID.");
+                return;
+            }
+
+            fetchVideos(i);
+        }
+
+        function fetchVideos(offset) {
+            fetch(`${url}/${service}/user/${creator_id}/?o=${offset}`, { method: "GET" })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const body = document.getElementById('user-section');
+                    const videoContainers = body.querySelectorAll('.video-container');
+                    videoContainers.forEach(container => container.remove());
+                    data.forEach(element => {
+                        if (element.file && element.file.name && element.file.name.endsWith(".mp4")) {
+                            const videoContainer = document.createElement("div");
+                            videoContainer.className = "video-container";
+
+                            const video = document.createElement("video");
+                            video.controls = true;
+                            video.className = "video";
+
+                            const source = document.createElement("source");
+                            source.src = `https://coomer.su/${element.file.path}`;
+                            source.type = "video/mp4";
+
+                            video.appendChild(source);
+                            videoContainer.appendChild(video);
+                            body.appendChild(videoContainer);
+                        }
+                    });
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        function changeOffset(step) {
+            i += step;
+            if (i < 0) i = 0; // Prevent negative offsets
+            document.getElementById("pageInput").value = i / 50;
+            fetchVideos(i);
+        }
+
+        function goToPage() {
+            const pageInput = document.getElementById("pageInput");
+            const page = parseInt(pageInput.value, 10);
+            if (!isNaN(page) && page >= 0) {
+                i = page * 50;
+                fetchVideos(i);
+            } else {
+                pageInput.value = i / 50;
+            }
+        }
+
+        let j = 0;
+
+        function fetchVideosCoomer(offset) {
+            fetch(`${url}/posts/popular/?o=${offset}`, { method: "GET" })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const posts = data.results;
+                    const body = document.getElementById('coomer-section');
+                    const videoContainers = body.querySelectorAll('.video-container');
+                    videoContainers.forEach(container => container.remove());
+                    posts.forEach(element => {
+                        if (element.file && element.file.name && element.file.name.endsWith(".mp4")) {
+                            const videoContainer = document.createElement("div");
+                            videoContainer.className = "video-container";
+
+                            const link = document.createElement("a");
+                            link.href = element.service === "onlyfans"
+                                ? `https://coomer.su/${element.service}/user/${element.user}`
+                                : `https://coomer.su/${element.service}/user/${element.id}`;
+                            link.textContent = "View User Profile";
+                            link.target = "_blank";
+
+                            const video = document.createElement("video");
+                            video.controls = true;
+                            video.className = "video";
+
+                            const source = document.createElement("source");
+                            source.src = `https://coomer.su/${element.file.path}`;
+                            source.type = "video/mp4";
+
+                            video.appendChild(source);
+                            videoContainer.appendChild(link);
+                            videoContainer.appendChild(video);
+                            body.appendChild(videoContainer);
+                        }
+                    });
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        function changeOffsetCoomer(step) {
+            j += step;
+            if (j < 0) j = 0; // Prevent negative offsets
+            document.getElementById("pageInputCoomer").value = j / 50;
+            fetchVideosCoomer(j);
+        }
+
+        function goToPageCoomer() {
+            const pageInput = document.getElementById("pageInputCoomer");
+            const page = parseInt(pageInput.value, 10);
+            if (!isNaN(page) && page >= 0) {
+                j = page * 50;
+                fetchVideosCoomer(j);
+            } else {
+                pageInput.value = j / 50;
+            }
+        }
+
+        // Initial load
+        showSection('coomer');
+		fetchVideosCoomer(0);
+    </script>
+
+</body>
+</html>
