@@ -97,6 +97,23 @@
         .hidden {
             display: none;
         }
+		select {
+			padding: 8px;
+			font-size: 16px;
+			border: 2px solid #ccc;
+			border-radius: 5px;
+			background-color: #fff;
+			cursor: pointer;
+			margin-right: 10px;
+		}
+		select:hover {
+			border-color: #007BFF;
+		}
+		select:focus {
+			outline: none;
+			border-color: #007BFF;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+		}
     </style>
 </head>
 <body>
@@ -109,7 +126,10 @@
     <div id="user-section" class="container">
         <div class="input-container">
             <label for="serviceInput">Service (onlyfans/fansly):</label>
-            <input type="text" id="serviceInput" placeholder="Enter service">
+            <select name="serviceInput" id="serviceInput" placeholder="Enter service">
+				<option value="onlyfans">Onlyfans</option>
+				<option value="fansly">Fansly</option>
+			</select>
             <label for="creatorIdInput">Creator ID:</label>
             <input type="text" id="creatorIdInput" placeholder="Enter creator ID">
             <button onclick="initializeFetch()">Load Videos</button>
@@ -181,7 +201,7 @@
                             video.className = "video";
 
                             const source = document.createElement("source");
-			    source.preload = "metadata";
+							source.preload = "metadata";
                             source.src = `https://coomer.su/${element.file.path}#t=0.1`;
                             source.type = "video/mp4";
 
@@ -189,6 +209,27 @@
                             videoContainer.appendChild(video);
                             body.appendChild(videoContainer);
                         }
+						if (element.attachments && element.attachments.length > 0) {
+							element.attachments.forEach(attachment => {
+								if (attachment.name.endsWith(".mp4")) {
+									const videoContainer = document.createElement("div");
+									videoContainer.className = "video-container";
+		
+									const video = document.createElement("video");
+									video.controls = true;
+									video.className = "video";
+		
+									const source = document.createElement("source");
+									source.preload = "metadata";
+									source.src = `https://coomer.su/${attachment.path}#t=0.1`;
+									source.type = "video/mp4";
+		
+									video.appendChild(source);
+									videoContainer.appendChild(video);
+									body.appendChild(videoContainer);
+								}
+							})
+						}
                     });
                 })
                 .catch(error => console.error(error.message));
@@ -244,7 +285,7 @@
                             video.className = "video";
 
                             const source = document.createElement("source");
-			    source.preload = "metadata";
+							source.preload = "metadata";
                             source.src = `https://coomer.su/${element.file.path}#t=0.1`;
                             source.type = "video/mp4";
 
@@ -253,6 +294,35 @@
                             videoContainer.appendChild(video);
                             body.appendChild(videoContainer);
                         }
+						if (element.attachments && element.attachments.length > 0) {
+							element.attachments.forEach(attachment => {
+								if (attachment.name.endsWith(".mp4")) {
+									const videoContainer = document.createElement("div");
+									videoContainer.className = "video-container";
+	
+									const link = document.createElement("a");
+									link.href = attachment.service === "onlyfans"
+										? `https://coomer.su/${attachment.service}/user/${attachment.user}`
+										: `https://coomer.su/${attachment.service}/user/${attachment.id}`;
+									link.textContent = "View User Profile";
+									link.target = "_blank";
+	
+									const video = document.createElement("video");
+									video.controls = true;
+									video.className = "video";
+	
+									const source = document.createElement("source");
+									source.preload = "metadata";
+									source.src = `https://coomer.su/${attachment.path}#t=0.1`;
+									source.type = "video/mp4";
+	
+									video.appendChild(source);
+									videoContainer.appendChild(link);
+									videoContainer.appendChild(video);
+									body.appendChild(videoContainer);
+								}
+							});
+						}
                     });
                 })
                 .catch(error => console.error(error.message));
