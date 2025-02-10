@@ -114,6 +114,13 @@
 			border-color: #007BFF;
 			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 		}
+		.status {
+			width: 100%;
+			text-align: center;
+			margin: 20px 0;
+			font-size: 16px;
+			font-weight: bold;
+		}
     </style>
 </head>
 <body>
@@ -136,18 +143,20 @@
         </div>
 
         <div class="controls">
-            <button onclick="changeOffset(-50)">Previous</button>
+			<button onclick="changeOffset(-50)">Previous</button>
             <input type="number" id="pageInput" min="0" value="0" onchange="goToPage()">
             <button onclick="changeOffset(50)">Next</button>
         </div>
+		<div class="status" id="user-status"></div>
     </div>
-
+	
     <div id="coomer-section" class="container hidden">
         <div class="controls">
             <button onclick="changeOffsetCoomer(-50)">Previous</button>
             <input type="number" id="pageInputCoomer" min="0" value="0" onchange="goToPageCoomer()">
             <button onclick="changeOffsetCoomer(50)">Next</button>
         </div>
+		<div class="status" id="coomer-status"></div>
     </div>
 
     <script>
@@ -180,6 +189,7 @@
         }
 
         function fetchVideos(offset) {
+			let nb_video = 0;
             fetch(`${url}/${service}/user/${creator_id}/?o=${offset}`, { method: "GET" })
                 .then(response => {
                     if (!response.ok) {
@@ -208,6 +218,8 @@
                             video.appendChild(source);
                             videoContainer.appendChild(video);
                             body.appendChild(videoContainer);
+
+							nb_video++;
                         }
 						if (element.attachments && element.attachments.length > 0) {
 							element.attachments.forEach(attachment => {
@@ -227,10 +239,13 @@
 									video.appendChild(source);
 									videoContainer.appendChild(video);
 									body.appendChild(videoContainer);
+
+									nb_video++;
 								}
 							})
 						}
                     });
+					document.getElementById("user-status").textContent = `${data.length} posts found for ${nb_video} videos.`
                 })
                 .catch(error => console.error(error.message));
         }
@@ -256,6 +271,7 @@
         let j = 0;
 
         function fetchVideosCoomer(offset) {
+			let nb_video = 0;
             fetch(`${url}/posts/popular/?o=${offset}`, { method: "GET" })
                 .then(response => {
                     if (!response.ok) {
@@ -293,6 +309,8 @@
                             videoContainer.appendChild(link);
                             videoContainer.appendChild(video);
                             body.appendChild(videoContainer);
+
+							nb_video++;
                         }
 						if (element.attachments && element.attachments.length > 0) {
 							element.attachments.forEach(attachment => {
@@ -301,9 +319,9 @@
 									videoContainer.className = "video-container";
 	
 									const link = document.createElement("a");
-									link.href = attachment.service === "onlyfans"
-										? `https://coomer.su/${attachment.service}/user/${attachment.user}`
-										: `https://coomer.su/${attachment.service}/user/${attachment.id}`;
+									link.href = element.service === "onlyfans"
+										? `https://coomer.su/${element.service}/user/${element.user}`
+										: `https://coomer.su/${element.service}/user/${element.id}`;
 									link.textContent = "View User Profile";
 									link.target = "_blank";
 	
@@ -320,10 +338,13 @@
 									videoContainer.appendChild(link);
 									videoContainer.appendChild(video);
 									body.appendChild(videoContainer);
+
+									nb_video++;
 								}
 							});
 						}
                     });
+					document.getElementById("coomer-status").textContent = `${posts.length} posts found for ${nb_video} videos.`
                 })
                 .catch(error => console.error(error.message));
         }
