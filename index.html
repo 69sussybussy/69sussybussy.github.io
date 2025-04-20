@@ -134,6 +134,13 @@
 			border-color: #007BFF;
 			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 		}
+        .status {
+			width: 100%;
+			text-align: center;
+			margin: 20px 0;
+			font-size: 16px;
+			font-weight: bold;
+		}
     </style>
 </head>
 <body>
@@ -156,12 +163,12 @@
             <input type="text" id="creatorIdInput" placeholder="Enter creator ID">
             <button onclick="initializeFetch()">Load Videos</button>
         </div>
-
         <div class="controls">
             <button onclick="changeOffset(-50)">Previous</button>
             <input type="number" id="pageInput" min="0" value="0" onchange="goToPage()">
             <button onclick="changeOffset(50)">Next</button>
         </div>
+        <div class="status" id="status"></div>
     </div>
 
     <div id="coomer-section" class="container hidden">
