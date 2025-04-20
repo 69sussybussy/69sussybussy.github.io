@@ -1,107 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Video Gallery</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 0;
-			padding: 0;
-			background-color: #f4f4f4;
-		}
-		.container {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: center;
-		}
-		.video-container {
-			margin: 10px;
-			border: 2px solid #ccc;
-			border-radius: 8px;
-			overflow: hidden;
-			background-color: #fff;
-			width: 300px;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			text-align: center;
-		}
-		.video-container a {
-			display: block;
-			font-size: 14px;
-			color: #007BFF;
-			text-decoration: none;
-			margin: 10px 0;
-		}
-		.video-container a:hover {
-			text-decoration: underline;
-		}
-		video {
-			width: 100%;
-			height: auto;
-			display: block;
-		}
-		.video-duration {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .video-container {
+            margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .dark-mode .video-container {
+            background-color: #1e1e1e;
+            border-color: #444;
+        }
+        .video-container a {
+            display: block;
+            font-size: 14px;
+            color: #007BFF;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+        .video-container a:hover {
+            text-decoration: underline;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .video-duration {
 			font-size: 14px;
 			font-weight: bold;
 			margin-top: 5px;
 		}
-		.controls {
-			width: 100%;
-			text-align: center;
-			margin: 20px 0;
-		}
-		button {
-			padding: 10px 20px;
-			font-size: 16px;
-			margin: 5px;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-			background-color: #007BFF;
-			color: #fff;
-		}
-		button:hover {
-			background-color: #0056b3;
-		}
-		input[type="number"] {
-			width: 60px;
-			padding: 5px;
-			font-size: 16px;
-			margin: 5px;
-			border: 2px solid #ccc;
-			border-radius: 5px;
-			text-align: center;
-		}
-		.input-container {
-			margin: 20px;
-			text-align: center;
-		}
-		.input-container label {
-			font-size: 16px;
-			margin-right: 10px;
-		}
-		.input-container input {
-			padding: 8px;
-			font-size: 16px;
-			border: 2px solid #ccc;
-			border-radius: 5px;
-		}
-		.input-container button {
-			padding: 8px 16px;
-			font-size: 16px;
-			margin-left: 10px;
-		}
-		.nav {
-			text-align: center;
-			margin: 20px 0;
-		}
-		.nav button {
-			margin: 0 10px;
-		}
-		.hidden {
-			display: none;
-		}
+        .controls {
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .dark-mode button {
+            background-color: #444;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            font-size: 16px;
+            margin: 5px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .input-container {
+            margin: 20px;
+            text-align: center;
+        }
+        .input-container label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .input-container input {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-container button {
+            padding: 8px 16px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav button {
+            margin: 0 10px;
+        }
+        .hidden {
+            display: none;
+        }
 		select {
 			padding: 8px;
 			font-size: 16px;
@@ -119,120 +134,111 @@
 			border-color: #007BFF;
 			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 		}
-		.status {
-			width: 100%;
-			text-align: center;
-			margin: 20px 0;
-			font-size: 16px;
-			font-weight: bold;
-		}
-	</style>
+    </style>
 </head>
 <body>
 
-	<div class="nav">
+    <div class="nav">
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
 		<button onclick="showSection('coomer')">Popular Videos</button>
-		<button onclick="showSection('user')">User Videos</button>
-	</div>
+        <button onclick="showSection('user')">User Videos</button>
+    </div>
 
-	<div id="user-section" class="container">
-		<div class="input-container">
-			<label for="serviceInput">Service (onlyfans/fansly):</label>
-			<select name="serviceInput" id="serviceInput" placeholder="Enter service">
-				<option value="onlyfans">Onlyfans</option>
-				<option value="fansly">Fansly</option>
+    <div id="user-section" class="container">
+        <div class="input-container">
+            <label for="serviceInput">Service (onlyfans/fansly):</label>
+            <select name="serviceInput" id="serviceInput" placeholder="Enter service">
+				<option value="auto">Auto</option>
+			    <option value="onlyfans">Onlyfans</option>
+			    <option value="fansly">Fansly</option>
 			</select>
-			<label for="creatorIdInput">Creator ID:</label>
-			<input type="text" id="creatorIdInput" placeholder="Enter creator ID">
-			<button onclick="initializeFetch()">Load Videos</button>
-		</div>
+            <label for="creatorIdInput">Creator ID:</label>
+            <input type="text" id="creatorIdInput" placeholder="Enter creator ID">
+            <button onclick="initializeFetch()">Load Videos</button>
+        </div>
 
-		<div class="controls">
-			<button onclick="changeOffset(-50)">Previous</button>
-			<input type="number" id="pageInput" min="0" value="0" onchange="goToPage()">
-			<button onclick="changeOffset(50)">Next</button>
-		</div>
-		<div class="status" id="user-status"></div>
-	</div>
-	
-	<div id="coomer-section" class="container hidden">
-		<div class="controls">
-			<button onclick="changeOffsetCoomer(-50)">Previous</button>
-			<input type="number" id="pageInputCoomer" min="0" value="0" onchange="goToPageCoomer()">
-			<button onclick="changeOffsetCoomer(50)">Next</button>
-		</div>
-		<div class="status" id="coomer-status"></div>
-	</div>
+        <div class="controls">
+            <button onclick="changeOffset(-50)">Previous</button>
+            <input type="number" id="pageInput" min="0" value="0" onchange="goToPage()">
+            <button onclick="changeOffset(50)">Next</button>
+        </div>
+    </div>
 
-	<script>
-		const url = "https://corsproxy.io/?url=https://coomer.su/api/v1";
-		let i = 0;
-		let service = "";
-		let creator_id = "";
+    <div id="coomer-section" class="container hidden">
+        <div class="controls">
+            <button onclick="changeOffsetcoomer(-50)">Previous</button>
+            <input type="number" id="pageInputcoomer" min="0" value="0" onchange="goToPagecoomer()">
+            <button onclick="changeOffsetcoomer(50)">Next</button>
+        </div>
+    </div>
 
-		function showSection(section) {
-			document.getElementById('user-section').classList.add('hidden');
-			document.getElementById('coomer-section').classList.add('hidden');
-			document.getElementById(`${section}-section`).classList.remove('hidden');
-		}
+    <script>
+        //https://corsproxy.io/?url=
+        const url = "https://corsproxy.io/?url=https://coomer.su/api/v1";
+        let i = 0;
+        let service = "";
+        let creator_id = "";
 
-		function initializeFetch() {
-			service = document.getElementById("serviceInput").value.trim().toLowerCase();
-			creator_id = document.getElementById("creatorIdInput").value.trim();
+        function showSection(section) {
+            document.getElementById('user-section').classList.add('hidden');
+            document.getElementById('coomer-section').classList.add('hidden');
+            document.getElementById(`${section}-section`).classList.remove('hidden');
+        }
 
-			if (service !== "onlyfans" && service !== "fansly") {
-				alert("Service must be either 'onlyfans' or 'fansly'.");
-				return;
-			}
+        function initializeFetch() {
+            service = document.getElementById("serviceInput").value.trim().toLowerCase();
+            creator_id = document.getElementById("creatorIdInput").value.trim();
 
-			if (!creator_id) {
-				alert("Please enter a valid Creator ID.");
-				return;
-			}
+            if (service === "auto") {
+                if (/^\d+$/.test(creator_id))
+                    service = "fansly"
+                else
+                    service = "onlyfans"
+            }
 
-			fetchVideos(i);
-		}
+            if (!creator_id) {
+                alert("Please enter a valid Creator ID.");
+                return;
+            }
 
-		function fetchVideos(offset) {
-			let nb_video = 0;
-			fetch(`${url}/${service}/user/${creator_id}/?o=${offset}`, { method: "GET" })
-				.then(response => {
-					if (!response.ok) {
-						throw new Error(`Response status: ${response.status}`);
-					}
-					return response.json();
-				})
-				.then(data => {
-					const body = document.getElementById('user-section');
-					const videoContainers = body.querySelectorAll('.video-container');
-					videoContainers.forEach(container => container.remove());
-					data.forEach(element => {
-						if (element.file && element.file.name && element.file.name.endsWith(".mp4")) {
-							const videoContainer = document.createElement("div");
-							videoContainer.className = "video-container";
+            fetchVideos(i);
+        }
 
-							const video = document.createElement("video");
-							video.controls = true;
-							video.className = "video";
+        function fetchVideos(offset) {
+            let nb_video = 0;
+            fetch(`${url}/${service}/user/${creator_id}/?o=${offset}`, { method: "GET" })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const body = document.getElementById('user-section');
+                    const videoContainers = body.querySelectorAll('.video-container');
+                    videoContainers.forEach(container => container.remove());
+                    data.forEach(element => {
+                        if (element.file && element.file.name && (element.file.name.endsWith(".mp4") || element.file.name.endsWith(".m4v"))) {
+                            nb_video++;
+                            const videoContainer = document.createElement("div");
+                            videoContainer.className = "video-container";
+
+                            const video = document.createElement("video");
+                            video.controls = true;
+                            video.className = "video";
 							video.preload = "metadata";
 
-							const link = document.createElement("a");
-							link.href = `https://coomer.su/${element.file.path}`
-							link.textContent = "Download";
-							link.target = "_blank";
+                            const source = document.createElement("source");
+                            source.src = `https://coomer.su/data${element.file.path}`;
+                            source.type = "video/mp4";
 
-							const source = document.createElement("source");
-							source.src = `https://coomer.su/${element.file.path}#t=0.1`;
-							source.type = "video/mp4";
-
-							const durationLabel = document.createElement("div");
+                            const durationLabel = document.createElement("div");
 							durationLabel.className = "video-duration";
 							durationLabel.textContent = "Loading...";
 
-							video.appendChild(source);
-							videoContainer.appendChild(link);
-							videoContainer.appendChild(video);
-							videoContainer.appendChild(durationLabel);
+                            video.appendChild(source);
+                            videoContainer.appendChild(video);
+                            videoContainer.appendChild(durationLabel);
 
 							video.onloadedmetadata = () => {
 								let hours = Math.floor(video.duration / 3600)
@@ -243,13 +249,12 @@
 									: `${minutes}:${seconds.toString().padStart(2, '0')}`;
 							};
 
-							body.appendChild(videoContainer);
-
-							nb_video++;
-						}
+                            body.appendChild(videoContainer);
+                        }
 						if (element.attachments && element.attachments.length > 0) {
 							element.attachments.forEach(attachment => {
-								if (attachment.name.endsWith(".mp4")) {
+								if (attachment.name.endsWith(".mp4") || attachment.name.endsWith(".m4v")) {
+                                    nb_video++;
 									const videoContainer = document.createElement("div");
 									videoContainer.className = "video-container";
 		
@@ -257,24 +262,18 @@
 									video.controls = true;
 									video.className = "video";
 									video.preload = "metadata";
-
-									const link = document.createElement("a");
-									link.href = `https://coomer.su/${element.file.path}`
-									link.textContent = "Download";
-									link.target = "_blank";
 		
 									const source = document.createElement("source");
-									source.src = `https://coomer.su/${attachment.path}#t=0.1`;
+									source.src = `https://coomer.su/data${attachment.path}`;
 									source.type = "video/mp4";
 
-									const durationLabel = document.createElement("div");
-									durationLabel.className = "video-duration";
-									durationLabel.textContent = "Loading...";
+                                    const durationLabel = document.createElement("div");
+                                    durationLabel.className = "video-duration";
+                                    durationLabel.textContent = "Loading...";
 		
 									video.appendChild(source);
-									videoContainer.appendChild(link);
 									videoContainer.appendChild(video);
-									videoContainer.appendChild(durationLabel);
+                                    videoContainer.appendChild(durationLabel);
 
 									video.onloadedmetadata = () => {
 										let hours = Math.floor(video.duration / 3600)
@@ -286,82 +285,81 @@
 									};
 
 									body.appendChild(videoContainer);
-
-									nb_video++;
 								}
 							})
 						}
-					});
-					document.getElementById("user-status").textContent = `${data.length} posts found for ${nb_video} videos.`
-				})
-				.catch(error => console.error(error.message));
-		}
+                    });
+                    document.getElementById("status").textContent = `${data.length} posts found for ${nb_video} videos found.`
+                })
+                .catch(error => console.error(error.message));
+        }
 
-		function changeOffset(step) {
-			i += step;
-			if (i < 0) i = 0; // Prevent negative offsets
-			document.getElementById("pageInput").value = i / 50;
-			fetchVideos(i);
-		}
+        function changeOffset(step) {
+            i += step;
+            if (i < 0) i = 0; // Prevent negative offsets
+            document.getElementById("pageInput").value = i / 50;
+            fetchVideos(i);
+        }
 
-		function goToPage() {
-			const pageInput = document.getElementById("pageInput");
-			const page = parseInt(pageInput.value, 10);
-			if (!isNaN(page) && page >= 0) {
-				i = page * 50;
-				fetchVideos(i);
-			} else {
-				pageInput.value = i / 50;
-			}
-		}
+        function goToPage() {
+            const pageInput = document.getElementById("pageInput");
+            const page = parseInt(pageInput.value, 10);
+            if (!isNaN(page) && page >= 0) {
+                i = page * 50;
+                fetchVideos(i);
+            } else {
+                pageInput.value = i / 50;
+            }
+        }
+        
+        let j = 0;
+        
+        let month = 4;
+        let year = 2024;
 
-		let j = 0;
+        function fetchVideoscoomer(offset) {
+            fetch(`${url}/posts/popular?o=${offset}`, { method: "GET" })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data)
+                    let posts = data.posts;
+                    if (posts == undefined)
+                        posts = data.results
+                    const body = document.getElementById('coomer-section');
+                    const videoContainers = body.querySelectorAll('.video-container');
+                    videoContainers.forEach(container => container.remove());
+                    posts.forEach(element => {
+                        if (element.file && element.file.name && element.file.name.endsWith(".mp4")) {
+                            const videoContainer = document.createElement("div");
+                            videoContainer.className = "video-container";
 
-		function fetchVideosCoomer(offset) {
-			let nb_video = 0;
-			fetch(`${url}/posts/popular/?o=${offset}`, { method: "GET" })
-				.then(response => {
-					if (!response.ok) {
-						throw new Error(`Response status: ${response.status}`);
-					}
-					return response.json();
-				})
-				.then(data => {
-					console.log(data)
-					const posts = data.results;
-					const body = document.getElementById('coomer-section');
-					const videoContainers = body.querySelectorAll('.video-container');
-					videoContainers.forEach(container => container.remove());
-					posts.forEach(element => {
-						if (element.file && element.file.name && element.file.name.endsWith(".mp4")) {
-							const videoContainer = document.createElement("div");
-							videoContainer.className = "video-container";
+                            const link = document.createElement("a");
+                            link.href = `https://coomer.su/${element.service}/user/${element.user}`
+                            link.textContent = "View User Profile";
+                            link.target = "_blank";
 
-							const link = document.createElement("a");
-							link.href = `https://coomer.su/${element.service}/user/${element.user}/post/${element.id}`
-							//link.href = element.service === "onlyfans"
-							//	? `https://coomer.su/${element.service}/user/${element.user}`
-							//	: `https://coomer.su/${element.service}/user/${element.id}`;
-							link.textContent = "View Post";
-							link.target = "_blank";
-
-							const video = document.createElement("video");
-							video.controls = true;
-							video.className = "video";
+                            const video = document.createElement("video");
+                            video.controls = true;
+                            video.className = "video";
 							video.preload = "metadata";
 
-							const source = document.createElement("source");
-							source.src = `https://coomer.su/${element.file.path}#t=0.1`;
-							source.type = "video/mp4";
+                            const source = document.createElement("source");
+                            source.src = `https://coomer.su/data${element.file.path}`;
+                            source.type = "video/mp4";
 
-							const durationLabel = document.createElement("div");
+                            const durationLabel = document.createElement("div");
 							durationLabel.className = "video-duration";
 							durationLabel.textContent = "Loading...";
 
-							video.appendChild(source);
-							videoContainer.appendChild(link);
-							videoContainer.appendChild(video);
-							videoContainer.appendChild(durationLabel);
+                            video.appendChild(source);
+                            videoContainer.appendChild(link);
+                            videoContainer.appendChild(video);
+                            videoContainer.appendChild(durationLabel);
 
 							video.onloadedmetadata = () => {
 								let hours = Math.floor(video.duration / 3600)
@@ -372,10 +370,8 @@
 									: `${minutes}:${seconds.toString().padStart(2, '0')}`;
 							};
 
-							body.appendChild(videoContainer);
-
-							nb_video++;
-						}
+                            body.appendChild(videoContainer);
+                        }
 						if (element.attachments && element.attachments.length > 0) {
 							element.attachments.forEach(attachment => {
 								if (attachment.name.endsWith(".mp4")) {
@@ -383,11 +379,8 @@
 									videoContainer.className = "video-container";
 	
 									const link = document.createElement("a");
-									link.href = `https://coomer.su/${element.service}/user/${element.user}/post/${element.id}`
-									//link.href = element.service === "onlyfans"
-									//	? `https://coomer.su/${element.service}/user/${element.user}`
-									//	: `https://coomer.su/${element.service}/user/${element.user}`;
-									link.textContent = "View Post";
+									link.href = `https://coomer.su/${element.service}/user/${element.user}`
+									link.textContent = "View User Profile";
 									link.target = "_blank";
 	
 									const video = document.createElement("video");
@@ -396,17 +389,17 @@
 									video.preload = "metadata";
 	
 									const source = document.createElement("source");
-									source.src = `https://coomer.su/${attachment.path}#t=0.1`;
+									source.src = `https://coomer.su/data${attachment.path}`;
 									source.type = "video/mp4";
 
-									const durationLabel = document.createElement("div");
-									durationLabel.className = "video-duration";
-									durationLabel.textContent = "Loading...";
+                                    const durationLabel = document.createElement("div");
+                                    durationLabel.className = "video-duration";
+                                    durationLabel.textContent = "Loading...";
 	
 									video.appendChild(source);
 									videoContainer.appendChild(link);
 									videoContainer.appendChild(video);
-									videoContainer.appendChild(durationLabel);
+                                    videoContainer.appendChild(durationLabel);
 
 									video.onloadedmetadata = () => {
 										let hours = Math.floor(video.duration / 3600)
@@ -418,38 +411,57 @@
 									};
 
 									body.appendChild(videoContainer);
-
-									nb_video++;
 								}
 							});
 						}
-					});
-					document.getElementById("coomer-status").textContent = `${posts.length} posts found for ${nb_video} videos.`
-				})
-				.catch(error => console.error(error.message));
-		}
+                    });
+                })
+                .catch(error => console.error(error.message));
+        }
 
-		function changeOffsetCoomer(step) {
-			j += step;
-			if (j < 0) j = 0; // Prevent negative offsets
-			document.getElementById("pageInputCoomer").value = j / 50;
-			fetchVideosCoomer(j);
-		}
+        function changeOffsetcoomer(step) {
+            if (step > 0) {
+                month--
+                if (month == 0) {
+                    month = 12
+                    year--
+                }
+            }
+            else {
+                month++
+                if (month > 12) {
+                    month = 1
+                    year++
+                }
+            }
 
-		function goToPageCoomer() {
-			const pageInput = document.getElementById("pageInputCoomer");
-			const page = parseInt(pageInput.value, 10);
-			if (!isNaN(page) && page >= 0) {
-				j = page * 50;
-				fetchVideosCoomer(j);
-			} else {
-				pageInput.value = j / 50;
-			}
-		}
+            j += step;
+            if (j < 0) j = 0; // Prevent negative offsets
+            document.getElementById("pageInputcoomer").value = j / 50;
+            fetchVideoscoomer(j);
+        }
 
-		// Initial load
-		fetchVideosCoomer(0);
-	</script>
+        function goToPagecoomer() {
+            const pageInput = document.getElementById("pageInputcoomer");
+            const page = parseInt(pageInput.value, 10);
+            if (!isNaN(page) && page >= 0) {
+                j = page * 50;
+                fetchVideoscoomer(j);
+            } else {
+                pageInput.value = j / 50;
+            }
+        }
+
+        document.body.classList.add('dark-mode');
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Initial load
+        showSection('coomer');
+		fetchVideoscoomer(0);
+    </script>
 
 </body>
 </html>
