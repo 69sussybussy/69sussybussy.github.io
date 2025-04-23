@@ -236,6 +236,11 @@
                             const videoContainer = document.createElement("div");
                             videoContainer.className = "video-container";
 
+							const link = document.createElement("a");
+                            link.href = `https://coomer.su/data${element.file.path}`
+                            link.textContent = "Download";
+                            link.target = "_blank";
+
                             const video = document.createElement("video");
                             video.controls = true;
                             video.className = "video";
@@ -254,6 +259,7 @@
 							durationLabel.textContent = "Loading...";
 
                             video.appendChild(source);
+							videoContainer.appendChild(link);
                             videoContainer.appendChild(video);
 							// videoContainer.appendChild(canvas);
                             videoContainer.appendChild(durationLabel);
@@ -278,6 +284,11 @@
                                     nb_video++;
 									const videoContainer = document.createElement("div");
 									videoContainer.className = "video-container";
+
+									const link = document.createElement("a");
+								link.href = `https://coomer.su/data${attachment.path}`
+								link.textContent = "Download";
+								link.target = "_blank";
 		
 									const video = document.createElement("video");
 									video.controls = true;
@@ -297,6 +308,7 @@
                                     durationLabel.textContent = "Loading...";
 		
 									video.appendChild(source);
+									videoContainer.appendChild(link);
 									videoContainer.appendChild(video);
 									// videoContainer.appendChild(canvas);
                                     videoContainer.appendChild(durationLabel);
