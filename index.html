@@ -43,7 +43,12 @@
             color: #007BFF;
             text-decoration: none;
             margin: 10px 0;
+			padding: 5px;
+			border-bottom: 1px solid #ccc;
         }
+		.video-container a:first-child {
+			margin-bottom: 15px;
+		}
         .video-container a:hover {
             text-decoration: underline;
         }
@@ -144,11 +149,10 @@
     </style>
 </head>
 <body>
-
     <div class="nav">
         <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-		<button onclick="showSection('coomer')">Popular Videos</button>
-        <button onclick="showSection('user')">User Videos</button>
+		<button onclick="changeURL('#popular')">Popular Videos</button>
+        <button onclick="changeURL('#user')">User Videos</button>
     </div>
 
     <div id="user-section" class="container">
@@ -161,7 +165,7 @@
 			</select>
             <label for="creatorIdInput">Creator ID:</label>
             <input type="text" id="creatorIdInput" placeholder="Enter creator ID">
-            <button onclick="initializeFetch()">Load Videos</button>
+            <button onclick="changeURL(`#user/user_id`)">Load Videos</button>
         </div>
         <div class="controls">
             <button onclick="changeOffset(-50)">Previous</button>
@@ -185,6 +189,7 @@
         let i = 0;
         let service = "";
         let creator_id = "";
+		let coomer_loaded = false;
 
         function showSection(section) {
             document.getElementById('user-section').classList.add('hidden');
@@ -195,6 +200,7 @@
         function initializeFetch() {
             service = document.getElementById("serviceInput").value.trim().toLowerCase();
             creator_id = document.getElementById("creatorIdInput").value.trim();
+			console.log("initialize "+creator_id)
 
             if (service === "auto") {
                 if (/^\d+$/.test(creator_id))
@@ -236,8 +242,12 @@
 							video.preload = "metadata";
 
                             const source = document.createElement("source");
-                            source.src = `https://coomer.su/data${element.file.path}`;
+                            source.src = `https://coomer.su/data${element.file.path}#t=0.1`;
                             source.type = "video/mp4";
+
+							const canvas = document.createElement("canvas");
+							canvas.style.display = "block";
+							canvas.style.margin = "0 auto";
 
                             const durationLabel = document.createElement("div");
 							durationLabel.className = "video-duration";
@@ -245,9 +255,13 @@
 
                             video.appendChild(source);
                             videoContainer.appendChild(video);
+							// videoContainer.appendChild(canvas);
                             videoContainer.appendChild(durationLabel);
 
 							video.onloadedmetadata = () => {
+								const ctx = canvas.getContext("2d");
+								ctx.drawImage(video, 0, 0);
+
 								let hours = Math.floor(video.duration / 3600)
 								let minutes = Math.floor((video.duration % 3600) / 60);
 								let seconds = Math.floor(video.duration % 60);
@@ -271,8 +285,12 @@
 									video.preload = "metadata";
 		
 									const source = document.createElement("source");
-									source.src = `https://coomer.su/data${attachment.path}`;
+									source.src = `https://coomer.su/data${attachment.path}#t=0.1`;
 									source.type = "video/mp4";
+
+									const canvas = document.createElement("canvas");
+									canvas.style.display = "block";
+									canvas.style.margin = "0 auto";
 
                                     const durationLabel = document.createElement("div");
                                     durationLabel.className = "video-duration";
@@ -280,9 +298,13 @@
 		
 									video.appendChild(source);
 									videoContainer.appendChild(video);
+									// videoContainer.appendChild(canvas);
                                     videoContainer.appendChild(durationLabel);
 
 									video.onloadedmetadata = () => {
+										const ctx = canvas.getContext("2d");
+										ctx.drawImage(video, 0, 0);
+
 										let hours = Math.floor(video.duration / 3600)
 										let minutes = Math.floor((video.duration % 3600) / 60);
 										let seconds = Math.floor(video.duration % 60);
@@ -350,14 +372,23 @@
                             link.textContent = "View User Profile";
                             link.target = "_blank";
 
+							const user_link = document.createElement("a");
+							user_link.href = `#user/${element.user}`;
+							user_link.textContent = "Other Videos";
+							user_link.target = "_blank";
+
                             const video = document.createElement("video");
                             video.controls = true;
                             video.className = "video";
 							video.preload = "metadata";
 
                             const source = document.createElement("source");
-                            source.src = `https://coomer.su/data${element.file.path}`;
+                            source.src = `https://coomer.su/data${element.file.path}#t=0.1`;
                             source.type = "video/mp4";
+
+							const canvas = document.createElement("canvas");
+							canvas.style.display = "block";
+							canvas.style.margin = "0 auto";
 
                             const durationLabel = document.createElement("div");
 							durationLabel.className = "video-duration";
@@ -365,10 +396,15 @@
 
                             video.appendChild(source);
                             videoContainer.appendChild(link);
+							videoContainer.appendChild(user_link);
                             videoContainer.appendChild(video);
+							// videoContainer.appendChild(canvas);
                             videoContainer.appendChild(durationLabel);
 
 							video.onloadedmetadata = () => {
+								const ctx = canvas.getContext("2d");
+								ctx.drawImage(video, 0, 0,);
+
 								let hours = Math.floor(video.duration / 3600)
 								let minutes = Math.floor((video.duration % 3600) / 60);
 								let seconds = Math.floor(video.duration % 60);
@@ -389,6 +425,11 @@
 									link.href = `https://coomer.su/${element.service}/user/${element.user}`
 									link.textContent = "View User Profile";
 									link.target = "_blank";
+
+									const user_link = document.createElement("a");
+									user_link.href = `#user/${element.user}`;
+									user_link.textContent = "Other Videos";
+									user_link.target = "_blank";
 	
 									const video = document.createElement("video");
 									video.controls = true;
@@ -396,8 +437,12 @@
 									video.preload = "metadata";
 	
 									const source = document.createElement("source");
-									source.src = `https://coomer.su/data${attachment.path}`;
+									source.src = `https://coomer.su/data${attachment.path}#t=0.1`;
 									source.type = "video/mp4";
+
+									const canvas = document.createElement("canvas");
+									canvas.style.display = "block";
+									canvas.style.margin = "0 auto";
 
                                     const durationLabel = document.createElement("div");
                                     durationLabel.className = "video-duration";
@@ -405,10 +450,15 @@
 	
 									video.appendChild(source);
 									videoContainer.appendChild(link);
+									videoContainer.appendChild(user_link);
 									videoContainer.appendChild(video);
+									// videoContainer.appendChild(canvas);
                                     videoContainer.appendChild(durationLabel);
 
 									video.onloadedmetadata = () => {
+										const ctx = canvas.getContext("2d");
+										ctx.drawImage(video, 0, 0);
+
 										let hours = Math.floor(video.duration / 3600)
 										let minutes = Math.floor((video.duration % 3600) / 60);
 										let seconds = Math.floor(video.duration % 60);
@@ -424,7 +474,39 @@
                     });
                 })
                 .catch(error => console.error(error.message));
+				coomer_loaded = true;
         }
+
+		function showSectionFromURL() {
+			const hash = window.location.hash;
+
+			if (hash === "#popular") {
+				showSection('coomer');
+				if (!coomer_loaded)
+					fetchVideoscoomer(0);
+			}
+			else if (hash === "#user") {
+				showSection('user');
+			}
+			else if (hash.startsWith("#user/")) {
+				const creatorId = hash.split('/')[1];
+				document.getElementById("creatorIdInput").value = creatorId;
+				console.log("showsectionfromurl " + document.getElementById("creatorIdInput").value.trim())
+				initializeFetch();
+			}
+		}
+
+		function changeURL(section) {
+			if (section.startsWith("#user/")) {
+				const creatorId = document.getElementById("creatorIdInput").value.trim();
+				console.log("changeurl " + creatorId)
+				history.replaceState(null, null, `#user/${creatorId}`)
+			}
+			else
+				history.replaceState(null, null, section);
+
+			showSectionFromURL();
+		}
 
         function changeOffsetcoomer(step) {
             if (step > 0) {
@@ -466,8 +548,10 @@
         }
 
         // Initial load
-        showSection('coomer');
-		fetchVideoscoomer(0);
+		window.onload = showSectionFromURL;
+		window.onhashchange = showSectionFromURL;
+        // showSection('coomer');
+		// fetchVideoscoomer(0);
     </script>
 
 </body>
