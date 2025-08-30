@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,12 +78,12 @@
             color: #007BFF;
             text-decoration: none;
             margin: 10px 0;
-			padding: 5px;
-			border-bottom: 1px solid #ccc;
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
         }
-		.video-container a:first-child {
-			margin-bottom: 15px;
-		}
+        .video-container a:first-child {
+            margin-bottom: 15px;
+        }
         .video-container a:hover {
             text-decoration: underline;
         }
@@ -94,10 +93,10 @@
             display: block;
         }
         .video-duration {
-			font-size: 14px;
-			font-weight: bold;
-			margin-top: 5px;
-		}
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
         .controls {
             width: 100%;
             text-align: center;
@@ -158,43 +157,49 @@
         .hidden {
             display: none;
         }
-		select {
-			padding: 8px;
-			font-size: 16px;
-			border: 2px solid #ccc;
-			border-radius: 5px;
-			background-color: #fff;
-			cursor: pointer;
-			margin-right: 10px;
-		}
-		select:hover {
-			border-color: #007BFF;
-		}
-		select:focus {
-			outline: none;
-			border-color: #007BFF;
-			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-		}
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        select:hover {
+            border-color: #007BFF;
+        }
+        select:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
         .status {
-			width: 100%;
-			text-align: center;
-			margin: 20px 0;
-			font-size: 16px;
-			font-weight: bold;
-		}
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
         .nombre {
-			width: 100%;
-			text-align: center;
-			margin: 20px 0;
-			font-size: 16px;
-			font-weight: bold;
-		}
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        canvas.thumb {
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <div class="nav">
         <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-		<button onclick="changeURL('#popular')">Popular Videos</button>
+        <button onclick="changeURL('#popular')">Popular Videos</button>
         <button onclick="changeURL('#user')">User Videos</button>
     </div>
 
@@ -202,11 +207,11 @@
         <div class="input-container">
             <label for="serviceInput">Service (onlyfans/fansly):</label>
             <select name="serviceInput" id="serviceInput" placeholder="Enter service">
-				<option value="auto">Auto</option>
-			    <option value="onlyfans">Onlyfans</option>
-			    <option value="fansly">Fansly</option>
+                <option value="auto">Auto</option>
+                <option value="onlyfans">Onlyfans</option>
+                <option value="fansly">Fansly</option>
                 <option value="candfans">CandFans</option>
-			</select>
+            </select>
             <label for="creatorIdInput">Creator ID:</label>
             <input type="text" id="creatorIdInput" placeholder="Enter creator ID">
             <button onclick="changeURL(`#user/user_id`)">Load Videos</button>
@@ -249,7 +254,7 @@
         let i = 0;
         let service = "";
         let creator_id = "";
-		let popularLoaded = false;
+        let popularLoaded = false;
         let videoMinLength = 60;
         let shortVideosHidden = false;
 
@@ -262,7 +267,7 @@
         function initializeFetch() {
             service = document.getElementById("serviceInput").value.trim().toLowerCase();
             creator_id = document.getElementById("creatorIdInput").value.trim();
-			console.log("initialize "+creator_id)
+            console.log("initialize "+creator_id)
 
             if (service === "auto") {
                 if (/^\d+$/.test(creator_id))
@@ -279,10 +284,59 @@
             fetchVideos(i);
         }
 
+        function createThumbnailOnly(videoUrl, videoContainer, durationLabel, counters, meta) {
+            const video = document.createElement("video");
+            video.preload = "metadata";
+            video.muted = true;
+            video.playsInline = true;
+            video.controls = false;
+            video.loop = false;
+            video.src = videoUrl + "#t=0.1";
+            video.style.width = "100%";
+            video.style.height = "auto";
+
+            // Right-click menu still works
+            video.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                menu.dataset.videoSrc = videoUrl;
+                menu.dataset.service = meta.service;
+                menu.dataset.userId = meta.userId;
+                menu.dataset.postId = meta.postId;
+                menu.style.top = `${e.pageY}px`;
+                menu.style.left = `${e.pageX}px`;
+                menu.style.display = 'block';
+            });
+
+            video.onloadedmetadata = () => {
+                const d = video.duration || 0;
+                videoContainer.dataset.duration = d;
+
+                let h = Math.floor(d / 3600);
+                let m = Math.floor((d % 3600) / 60);
+                let s = Math.floor(d % 60);
+                durationLabel.textContent = h > 0
+                    ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`
+                    : `${m}:${s.toString().padStart(2,'0')}`;
+
+                counters.nb_total_load++;
+                if (d >= videoMinLength) counters.nb_length++;
+                document.getElementById(counters.nombreId).textContent =
+                    `${counters.nb_length} videos ≥ ${videoMinLength}s out of ${counters.nb_total_load} loaded.`;
+
+                if (shortVideosHidden && d < videoMinLength)
+                    videoContainer.style.display = "none";
+            };
+
+            // Insert before the duration label (like thumbnail)
+            videoContainer.insertBefore(video, durationLabel);
+        }
+
+
         function fetchVideos(offset) {
             let nb_video = 0;
-            let nb_length = 0;
-            let nb_total_load = 0;
+            // create a shared counters object so each thumbnail increments the same counters
+            const counters = { nb_length: 0, nb_total_load: 0, nombreId: "nombreUser" };
+
             fetch(`${proxy}${url}/${service}/user/${creator_id}/posts?o=${offset}`, { method: "GET", headers: {'Accept': 'text/css'} })
                 .then(response => {
                     if (!response.ok) {
@@ -294,7 +348,8 @@
                     return response.json();
                 })
                 .then(data => {
-                    document.getElementById("nombreUser").textContent = `${nb_length} video longer than ${videoMinLength} seconds for ${nb_total_load} videos loaded.`
+                    // initialize display with zero values
+                    document.getElementById("nombreUser").textContent = `${counters.nb_length} video longer than ${videoMinLength} seconds for ${counters.nb_total_load} videos loaded.`
                     const body = document.getElementById('user-section');
                     const videoContainers = body.querySelectorAll('.video-container');
                     videoContainers.forEach(container => container.remove());
@@ -304,135 +359,61 @@
                             const videoContainer = document.createElement("div");
                             videoContainer.className = "video-container";
 
-							const link = document.createElement("a");
+                            const link = document.createElement("a");
                             link.href = `player.html?video=https://coomer.st/data${element.file.path}`
-                            link.textContent = "Download";
+                            link.textContent = "Watch Video";
                             link.target = "_blank";
 
-                            const video = document.createElement("video");
-                            video.controls = true;
-                            video.className = "video";
-							video.preload = "metadata";
-
-                            const source = document.createElement("source");
-                            source.src = `https://coomer.st/data${element.file.path}#t=0.1`;
-                            source.type = "video/mp4";
-
-							const canvas = document.createElement("canvas");
-							canvas.style.display = "block";
-							canvas.style.margin = "0 auto";
-
                             const durationLabel = document.createElement("div");
-							durationLabel.className = "video-duration";
-							durationLabel.textContent = "Loading...";
+                            durationLabel.className = "video-duration";
+                            durationLabel.textContent = "Loading...";
 
-                            video.appendChild(source);
-							videoContainer.appendChild(link);
-                            videoContainer.appendChild(video);
-							// videoContainer.appendChild(canvas);
+                            videoContainer.appendChild(link);
                             videoContainer.appendChild(durationLabel);
 
-                            video.addEventListener('contextmenu', function(e) {
-                                e.preventDefault()
-                                menu.dataset.videoSrc = this.querySelector('source').src.replace('#t=0.1', '')
-                                menu.dataset.service = service
-                                menu.dataset.userId = creator_id
-                                menu.dataset.postId = element.id
-                                menu.style.top = `${e.pageY}px`;
-                                menu.style.left = `${e.pageX}px`;
-                                menu.style.display = 'block';
-                            })
-
-							video.onloadedmetadata = () => {
-								const ctx = canvas.getContext("2d");
-								ctx.drawImage(video, 0, 0);
-
-								let hours = Math.floor(video.duration / 3600)
-								let minutes = Math.floor((video.duration % 3600) / 60);
-								let seconds = Math.floor(video.duration % 60);
-								durationLabel.textContent = hours > 0
-									? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-									: `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                                if (hours > 0 || (minutes * 60 + seconds) >= videoMinLength)
-                                    nb_length++;
-                                nb_total_load++;
-                                document.getElementById("nombreUser").textContent = `${nb_length} video longer than ${videoMinLength} seconds for ${nb_total_load} videos loaded.`
-
-                                if (shortVideosHidden == true && video.duration < videoMinLength)
-                                    videoContainer.style.display = "none";
-							};
+                            const videoUrl = `https://coomer.st/data${element.file.path}`;
+                            createThumbnailOnly(
+                                videoUrl,
+                                videoContainer,
+                                durationLabel,
+                                counters,
+                                { service, userId: creator_id, postId: element.id }
+                            );
 
                             body.appendChild(videoContainer);
                         }
-						if (element.attachments && element.attachments.length > 0) {
-							element.attachments.forEach(attachment => {
-								if (attachment.name.endsWith(".mp4") || attachment.name.endsWith(".m4v")) {
+                        if (element.attachments && element.attachments.length > 0) {
+                            element.attachments.forEach(attachment => {
+                                if (attachment.name.endsWith(".mp4") || attachment.name.endsWith(".m4v")) {
                                     nb_video++;
-									const videoContainer = document.createElement("div");
-									videoContainer.className = "video-container";
+                                    const videoContainer = document.createElement("div");
+                                    videoContainer.className = "video-container";
 
-									const link = document.createElement("a");
-                                link.href = `player.html?video=https://coomer.st/data${attachment.path}`
-								link.textContent = "Download";
-								link.target = "_blank";
-		
-									const video = document.createElement("video");
-									video.controls = true;
-									video.className = "video";
-									video.preload = "metadata";
-		
-									const source = document.createElement("source");
-									source.src = `https://coomer.st/data${attachment.path}#t=0.1`;
-									source.type = "video/mp4";
-
-									const canvas = document.createElement("canvas");
-									canvas.style.display = "block";
-									canvas.style.margin = "0 auto";
+                                    const link = document.createElement("a");
+                                    link.href = `player.html?video=https://coomer.st/data${attachment.path}`
+                                    link.textContent = "Watch Video";
+                                    link.target = "_blank";
 
                                     const durationLabel = document.createElement("div");
                                     durationLabel.className = "video-duration";
                                     durationLabel.textContent = "Loading...";
-		
-									video.appendChild(source);
-									videoContainer.appendChild(link);
-									videoContainer.appendChild(video);
-									// videoContainer.appendChild(canvas);
+
+                                    videoContainer.appendChild(link);
                                     videoContainer.appendChild(durationLabel);
 
-                                    video.addEventListener('contextmenu', function(e) {
-                                        e.preventDefault()
-                                        menu.dataset.videoSrc = this.querySelector('source').src.replace('#t=0.1', '')
-                                        menu.dataset.service = service
-                                        menu.dataset.userId = creator_id
-                                        menu.dataset.postId = element.id
-                                        menu.style.top = `${e.pageY}px`;
-                                        menu.style.left = `${e.pageX}px`;
-                                        menu.style.display = 'block';
-                                    })
+                                    const videoUrl = `https://coomer.st/data${attachment.path}`;
+                                    createThumbnailOnly(
+                                        videoUrl,
+                                        videoContainer,
+                                        durationLabel,
+                                        counters,
+                                        { service, userId: creator_id, postId: element.id }
+                                    );
 
-									video.onloadedmetadata = () => {
-										const ctx = canvas.getContext("2d");
-										ctx.drawImage(video, 0, 0);
-
-										let hours = Math.floor(video.duration / 3600)
-										let minutes = Math.floor((video.duration % 3600) / 60);
-										let seconds = Math.floor(video.duration % 60);
-										durationLabel.textContent = hours > 0
-											? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-											: `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                                        if (hours > 0 || (minutes * 60 + seconds) >= videoMinLength)
-                                            nb_length++;
-                                        nb_total_load++;
-                                        document.getElementById("nombreUser").textContent = `${nb_length} video longer than ${videoMinLength} seconds for ${nb_total_load} videos loaded.`
-
-                                        if (shortVideosHidden == true && video.duration < videoMinLength)
-                                            videoContainer.style.display = "none";
-									};
-
-									body.appendChild(videoContainer);
-								}
-							})
-						}
+                                    body.appendChild(videoContainer);
+                                }
+                            })
+                        }
                     });
                     document.getElementById("status").textContent = `${data.length} posts found for ${nb_video} videos found.`
                 })
@@ -456,15 +437,16 @@
                 pageInput.value = i / 50;
             }
         }
-        
+
         let j = 0;
-        
+
         let month = 4;
         let year = 2024;
 
         function fetchVideosPopular(offset) {
-            let nb_length = 0;
-            let nb_total_load = 0;
+            // create a shared counters object for the popular view
+            const counters = { nb_length: 0, nb_total_load: 0, nombreId: "nombrePopular" };
+
             fetch(`${proxy}${url}/posts/popular?o=${offset}`, { method: "GET" })
                 .then(response => {
                     if (!response.ok) {
@@ -473,7 +455,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    document.getElementById("nombrePopular").textContent = `${nb_length} video longer than ${videoMinLength} seconds for ${nb_total_load} videos loaded.`
+                    document.getElementById("nombrePopular").textContent = `${counters.nb_length} video longer than ${videoMinLength} seconds for ${counters.nb_total_load} videos loaded.`
                     console.log(data)
                     let posts = data.posts;
                     if (posts == undefined)
@@ -491,145 +473,83 @@
                             link.textContent = "View User Profile";
                             link.target = "_blank";
 
-							const user_link = document.createElement("a");
-							user_link.href = `#user/${element.service}/${element.user}`;
-							user_link.textContent = "Other Videos";
-							user_link.target = "_blank";
+                            const user_link = document.createElement("a");
+                            user_link.href = `#user/${element.service}/${element.user}`;
+                            user_link.textContent = "Other Videos";
+                            user_link.target = "_blank";
 
-                            const video = document.createElement("video");
-                            video.controls = true;
-                            video.className = "video";
-							video.preload = "metadata";
-
-                            const source = document.createElement("source");
-                            source.src = `https://coomer.st/data${element.file.path}#t=0.1`;
-                            source.type = "video/mp4";
-
-							const canvas = document.createElement("canvas");
-							canvas.style.display = "block";
-							canvas.style.margin = "0 auto";
+                            const videoLink = document.createElement("a");
+                            videoLink.href = `player.html?video=${encodeURIComponent(link.href)}`;
+                            videoLink.textContent = "Watch Video";
+                            videoLink.target = "_blank";
 
                             const durationLabel = document.createElement("div");
-							durationLabel.className = "video-duration";
-							durationLabel.textContent = "Loading...";
+                            durationLabel.className = "video-duration";
+                            durationLabel.textContent = "Loading...";
 
-                            video.appendChild(source);
                             videoContainer.appendChild(link);
-							videoContainer.appendChild(user_link);
-                            videoContainer.appendChild(video);
-							// videoContainer.appendChild(canvas);
+                            videoContainer.appendChild(user_link);
+                            videoContainer.appendChild(videoLink);
                             videoContainer.appendChild(durationLabel);
 
-                            video.addEventListener('contextmenu', function(e) {
-                                e.preventDefault()
-                                menu.dataset.videoSrc = this.querySelector('source').src.replace('#t=0.1', '')
-                                menu.dataset.service = element.service
-                                menu.dataset.userId = element.user
-                                menu.dataset.postId = element.id
-                                menu.style.top = `${e.pageY}px`;
-                                menu.style.left = `${e.pageX}px`;
-                                menu.style.display = 'block';
-                            })
-
-							video.onloadedmetadata = () => {
-								const ctx = canvas.getContext("2d");
-								ctx.drawImage(video, 0, 0,);
-
-								let hours = Math.floor(video.duration / 3600)
-								let minutes = Math.floor((video.duration % 3600) / 60);
-								let seconds = Math.floor(video.duration % 60);
-								durationLabel.textContent = hours > 0
-									? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-									: `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                                if (hours > 0 || (minutes * 60 + seconds) >= videoMinLength)
-                                    nb_length++;
-                                nb_total_load++;
-                                document.getElementById("nombrePopular").textContent = `${nb_length} video longer than ${videoMinLength} seconds for ${nb_total_load} videos loaded.`
-
-                                if (shortVideosHidden == true && video.duration < videoMinLength)
-                                    videoContainer.style.display = "none";
-							};
+                            const videoUrl = `https://coomer.st/data${element.file.path}`;
+                            createThumbnailOnly(
+                                videoUrl,
+                                videoContainer,
+                                durationLabel,
+                                counters,
+                                { service: element.service, userId: element.user, postId: element.id }
+                            );
 
                             body.appendChild(videoContainer);
                         }
-						if (element.attachments && element.attachments.length > 0) {
-							element.attachments.forEach(attachment => {
-								if (attachment.name.endsWith(".mp4")) {
-									const videoContainer = document.createElement("div");
-									videoContainer.className = "video-container";
-	
-									const link = document.createElement("a");
-									link.href = `https://coomer.st/${element.service}/user/${element.user}`
-									link.textContent = "View User Profile";
-									link.target = "_blank";
+                        if (element.attachments && element.attachments.length > 0) {
+                            element.attachments.forEach(attachment => {
+                                if (attachment.name.endsWith(".mp4")) {
+                                    const videoContainer = document.createElement("div");
+                                    videoContainer.className = "video-container";
 
-									const user_link = document.createElement("a");
-									user_link.href = `#user/${element.service}/${element.user}`;
-									user_link.textContent = "Other Videos";
-									user_link.target = "_blank";
-	
-									const video = document.createElement("video");
-									video.controls = true;
-									video.className = "video";
-									video.preload = "metadata";
-	
-									const source = document.createElement("source");
-									source.src = `https://coomer.st/data${attachment.path}#t=0.1`;
-									source.type = "video/mp4";
+                                    const link = document.createElement("a");
+                                    link.href = `https://coomer.st/${element.service}/user/${element.user}`
+                                    link.textContent = "View User Profile";
+                                    link.target = "_blank";
 
-									const canvas = document.createElement("canvas");
-									canvas.style.display = "block";
-									canvas.style.margin = "0 auto";
+                                    const user_link = document.createElement("a");
+                                    user_link.href = `#user/${element.service}/${element.user}`;
+                                    user_link.textContent = "Other Videos";
+                                    user_link.target = "_blank";
+
+                                    const videoLink = document.createElement("a");
+                                    videoLink.href = `player.html?video=${encodeURIComponent(link.href)}`;
+                                    videoLink.textContent = "Watch Video";
+                                    videoLink.target = "_blank";
 
                                     const durationLabel = document.createElement("div");
                                     durationLabel.className = "video-duration";
                                     durationLabel.textContent = "Loading...";
-	
-									video.appendChild(source);
-									videoContainer.appendChild(link);
-									videoContainer.appendChild(user_link);
-									videoContainer.appendChild(video);
-									// videoContainer.appendChild(canvas);
+
+                                    videoContainer.appendChild(link);
+                                    videoContainer.appendChild(user_link);
+                                    videoContainer.appendChild(videoLink);
                                     videoContainer.appendChild(durationLabel);
 
-                                    video.addEventListener('contextmenu', function(e) {
-                                        e.preventDefault()
-                                        menu.dataset.videoSrc = this.querySelector('source').src.replace('#t=0.1', '')
-                                        menu.dataset.service = element.service
-                                        menu.dataset.userId = element.user
-                                        menu.dataset.postId = element.id
-                                        menu.style.top = `${e.pageY}px`;
-                                        menu.style.left = `${e.pageX}px`;
-                                        menu.style.display = 'block';
-                                    })
+                                    const videoUrl = `https://coomer.st/data${attachment.path}`;
+                                    createThumbnailOnly(
+                                        videoUrl,
+                                        videoContainer,
+                                        durationLabel,
+                                        counters,
+                                        { service: element.service, userId: element.user, postId: element.id }
+                                    );
 
-									video.onloadedmetadata = () => {
-										const ctx = canvas.getContext("2d");
-										ctx.drawImage(video, 0, 0);
-
-										let hours = Math.floor(video.duration / 3600)
-										let minutes = Math.floor((video.duration % 3600) / 60);
-										let seconds = Math.floor(video.duration % 60);
-										durationLabel.textContent = hours > 0
-											? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-											: `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                                        if (hours > 0 || (minutes * 60 + seconds) >= videoMinLength)
-                                            nb_length++;
-                                        nb_total_load++;
-                                        document.getElementById("nombrePopular").textContent = `${nb_length} video longer than ${videoMinLength} seconds for ${nb_total_load} videos loaded.`
-
-                                        if (shortVideosHidden == true && video.duration < videoMinLength)
-                                            videoContainer.style.display = "none";
-									};
-
-									body.appendChild(videoContainer);
-								}
-							});
-						}
+                                    body.appendChild(videoContainer);
+                                }
+                            });
+                        }
                     });
                 })
                 .catch(error => console.error(error.message));
-				popularLoaded = true;
+                popularLoaded = true;
         }
 
         document.addEventListener('click', (e) => {
@@ -653,45 +573,45 @@
                 window.open(`https://coomer.st/${service}/user/${userId}/post/${postId}`)
         })
 
-		function showSectionFromURL() {
-			const hash = window.location.hash;
+        function showSectionFromURL() {
+            const hash = window.location.hash;
 
-			if (hash === "#popular") {
-				showSection('popular');
-				if (!popularLoaded)
-					fetchVideosPopular(0);
-			}
-			else if (hash === "#user") {
-				showSection('user');
-			}
-			else if (hash.startsWith("#user/")) {
+            if (hash === "#popular") {
+                showSection('popular');
+                if (!popularLoaded)
+                    fetchVideosPopular(0);
+            }
+            else if (hash === "#user") {
+                showSection('user');
+            }
+            else if (hash.startsWith("#user/")) {
                 const service = hash.split('/')[1];
                 if (service != "onlyfans" && service != "fansly" && service != "candfans" && service != "auto") {
                     console.log("Wrong service, it can only be onlyfans, fansly or candfans");
                     return;
                 }
-				const creatorId = hash.split('/')[2];
-				document.getElementById("creatorIdInput").value = creatorId;
+                const creatorId = hash.split('/')[2];
+                document.getElementById("creatorIdInput").value = creatorId;
                 document.getElementById("serviceInput").value = service;
-				console.log("showsectionfromurl " + document.getElementById("creatorIdInput").value.trim())
-				initializeFetch();
-			}
-		}
+                console.log("showsectionfromurl " + document.getElementById("creatorIdInput").value.trim())
+                initializeFetch();
+            }
+        }
 
-		function changeURL(section) {
-			if (section.startsWith("#user/")) {
-				const creatorId = document.getElementById("creatorIdInput").value.trim();
+        function changeURL(section) {
+            if (section.startsWith("#user/")) {
+                const creatorId = document.getElementById("creatorIdInput").value.trim();
                 const service = document.getElementById("serviceInput").value
-				console.log("changeurl " + service)
+                console.log("changeurl " + service)
                 document.getElementById("pageInput").value = 0
                 i = 0;
-				history.replaceState(null, null, `#user/${service}/${creatorId}`)
-			}
-			else
-				history.replaceState(null, null, section);
+                history.replaceState(null, null, `#user/${service}/${creatorId}`)
+            }
+            else
+                history.replaceState(null, null, section);
 
-			showSectionFromURL();
-		}
+            showSectionFromURL();
+        }
 
         function changeOffsetPopular(step) {
             if (step > 0) {
@@ -731,8 +651,8 @@
             const button = document.getElementById("toggleFilterBtnUser");
 
             containers.forEach(container => {
-                const video = container.querySelector("video");
-                if (video && video.duration < videoMinLength) {
+                const dur = parseFloat(container.dataset.duration || "0");
+                if (!isNaN(dur) && dur < videoMinLength) {
                     container.style.display = shortVideosHidden ? "block" : "none";
                 }
             });
@@ -746,8 +666,8 @@
             const button = document.getElementById("toggleFilterBtnPopular");
 
             containers.forEach(container => {
-                const video = container.querySelector("video");
-                if (video && video.duration < videoMinLength) {
+                const dur = parseFloat(container.dataset.duration || "0");
+                if (!isNaN(dur) && dur < videoMinLength) {
                     container.style.display = shortVideosHidden ? "block" : "none";
                 }
             });
@@ -763,10 +683,8 @@
         }
 
         // Initial load
-		window.onload = showSectionFromURL;
-		window.onhashchange = showSectionFromURL;
-        // showSection('coomer');
-		// fetchVideosPopular(0);
+        window.onload = showSectionFromURL;
+        window.onhashchange = showSectionFromURL;
     </script>
 
 </body>
