@@ -16,7 +16,7 @@ exports.handler = async function(event, context) {
       method: 'GET',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
+        'Accept': 'application/json, text/plain, text/css, */*',
         'Accept-Language': 'en-US,en;q=0.9',
         'Referer': 'https://coomer.st/', // Très important pour certains sites
       }
@@ -49,4 +49,5 @@ exports.handler = async function(event, context) {
       body: JSON.stringify({ error: 'Failed to fetch data', details: error.message }),
     };
   }
+
 };
