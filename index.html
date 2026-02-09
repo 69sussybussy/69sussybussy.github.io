@@ -248,7 +248,7 @@
 
     <script>
         const menu = document.getElementById('customMenu')
-        const proxy = "https://corsproxy.io/?url=";
+        const proxy = "/.netlify/functions/proxy/?url=";
         // const proxy = ""
         const url = "https://coomer.st/api/v1";
         let i = 0;
@@ -294,6 +294,7 @@
             video.src = videoUrl + "#t=0.1";
             video.style.width = "100%";
             video.style.height = "auto";
+            videoContainer.dataset.loaded = false
 
             // Right-click menu still works
             video.addEventListener('contextmenu', function(e) {
@@ -309,6 +310,7 @@
 
             video.onloadedmetadata = () => {
                 const d = video.duration || 0;
+                videoContainer.dataset.loaded = true
                 videoContainer.dataset.duration = d;
 
                 let h = Math.floor(d / 3600);
@@ -479,7 +481,7 @@
                             user_link.target = "_blank";
 
                             const videoLink = document.createElement("a");
-                            videoLink.href = `player.html?video=https://coomer.st/data${element.file.path}`;
+                            videoLink.href = `player.html?video=https://coomer.st/data/${element.file.path}`;
                             videoLink.textContent = "Watch Video";
                             videoLink.target = "_blank";
 
@@ -520,7 +522,7 @@
                                     user_link.target = "_blank";
 
                                     const videoLink = document.createElement("a");
-                                    videoLink.href = `player.html?video=https://coomer.st/data${attachment.path}`;
+                                    videoLink.href = `player.html?video=https://coomer.st/data/${attachment.path}`;
                                     videoLink.textContent = "Watch Video";
                                     videoLink.target = "_blank";
 
@@ -651,9 +653,11 @@
             const button = document.getElementById("toggleFilterBtnUser");
 
             containers.forEach(container => {
-                const dur = parseFloat(container.dataset.duration || "0");
-                if (!isNaN(dur) && dur < videoMinLength) {
-                    container.style.display = shortVideosHidden ? "block" : "none";
+                if (container.dataset.loaded == "true") {
+                    const dur = parseFloat(container.dataset.duration || "0");
+                    if (!isNaN(dur) && dur < videoMinLength) {
+                        container.style.display = shortVideosHidden ? "block" : "none";
+                    }
                 }
             });
 
@@ -666,9 +670,11 @@
             const button = document.getElementById("toggleFilterBtnPopular");
 
             containers.forEach(container => {
-                const dur = parseFloat(container.dataset.duration || "0");
-                if (!isNaN(dur) && dur < videoMinLength) {
-                    container.style.display = shortVideosHidden ? "block" : "none";
+                if (container.dataset.loaded == "true") {
+                    const dur = parseFloat(container.dataset.duration || "0");
+                    if (!isNaN(dur) && dur < videoMinLength) {
+                        container.style.display = shortVideosHidden ? "block" : "none";
+                    }
                 }
             });
 
